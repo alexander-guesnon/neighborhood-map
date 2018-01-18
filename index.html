@@ -14,20 +14,19 @@
 </head>
 
 <body>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZHdlzT2y-Fj_hDLz7npwpF6KifyRjM1Q&callback=initMap" async defer></script>
   <h1>Neighborhood Map</h1><br>
   <div class="container">
-  <div class="row">
-    <div class="col-4">
+    <div class="row">
+      <div class="col-4">
         <input type="text" />
         <input type="submit" value="filter" />
-      <ul data-bind="foreach: list">
-        <li data-bind="text: $data">
-
-        </li>
-      </ul>
+        <ul data-bind="foreach: list">
+          <li data-bind="text: $data"></li>
+        </ul>
+      </div>
+      <div id="map" class="col-8"></div>
     </div>
-    <div id="map" class="col-8"><img src="https://i.imgur.com/4kiPYbF.gif" alt="place holder img" /></div>
-  </div>
   </div>
   <!--this is a place holder for google maps api-->
 </body>

@@ -1,8 +1,13 @@
-//somthing
+var map;
 var ViewModle = function(){
-  //modle
   this.list = ko.observableArray([1,2,3,4,5]);
 
 }
-console.log()
 ko.applyBindings(new ViewModle());
+
+function initMap(){
+map = new google.maps.Map(document.getElementById('map'),{
+  center:{lat:40.7413549, lng:-73.9980244},
+  zoom: 13
+});
+}
