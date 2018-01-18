@@ -20,7 +20,11 @@
     <div class="col-4">
         <input type="text" />
         <input type="submit" value="filter" />
-      <ul data-bind="html: printedList"></ul>
+      <ul data-bind="foreach: list">
+        <li data-bind="text: $data">
+
+        </li>
+      </ul>
     </div>
     <div id="map" class="col-8"><img src="https://i.imgur.com/4kiPYbF.gif" alt="place holder img" /></div>
   </div>
