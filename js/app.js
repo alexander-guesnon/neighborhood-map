@@ -2,6 +2,10 @@
 // TODO: implement wiki geo location
 // TODO: hover over list
 // TODO: make mobile freindly
+// TODO: errorhandle apis
+// TODO: comment code
+// TODO: filter list
+// TODO: markers
 /*  this.test = ko.computed(function() {
     var list = [1,2,3,4]; //th5s needs to wait for the api call to finish
     $.getJSON("https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=10000&gscoord=37.786971%7C-122.399677&format=json&callback=?", function(data) {
@@ -15,6 +19,23 @@
       }
     });
     return list;
+
+
+    [new google.maps.Marker({
+      position: {
+        lat: data.query.geosearch[3].lat,
+        lng: data.query.geosearch[3].lon
+      },
+      map: map,
+      title: data.query.geosearch[3].title
+    }),new google.maps.Marker({
+      position: {
+        lat: data.query.geosearch[2].lat,
+        lng: data.query.geosearch[2].lon
+      },
+      map: map,
+      title: data.query.geosearch[2].title
+    })];
   });
 
  console.log(this.test());*/
@@ -63,7 +84,9 @@ var ViewModle = function() {
   self.test = ko.observableArray([]);
   self.GetData = function() {
     $.getJSON("https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=10000&gscoord=37.786971%7C-122.399677&format=json&callback=?", function(data) {
-        self.test.push(data.query.geosearch)
+        for (var i = 0; i < data.query.geosearch.length; i++) {
+          self.test.push(data.query.geosearch[i].title)
+        }
         console.log(data.query.geosearch)
 
       });
@@ -86,14 +109,20 @@ function initMap() {
     zoom: 13
   });
   $.getJSON("https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=10000&gscoord=37.786971%7C-122.399677&format=json&callback=?", function(data) {
-    var marker = new google.maps.Marker({
-      position: {
-        lat: data.query.geosearch[3].lat,
-        lng: data.query.geosearch[3].lon
-      },
-      map: map,
-      title: data.query.geosearch[3].title
-    });
+    var marker =[]
+    for (var i = 0; i < data.query.geosearch.length; i++) {
+      tempmarker = new google.maps.Marker({
+        position: {
+          lat: data.query.geosearch[i].lat,
+          lng: data.query.geosearch[i].lon
+        },
+        map: map,
+        title: data.query.geosearch[i].title
+      });
+      marker.push(tempmarker)
+    }
+    console.log(marker)
+
 
   });
 
