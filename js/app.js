@@ -2,8 +2,6 @@
 // TODO: make mobile freindly
 // TODO: errorhandle apis
 // TODO: comment code
-// TODO: make wiki search into varable so it is based on browser locaiton and also can change circle
-// TODO: clicking on a marker makes it show info
 
 
 var markers = [];
@@ -40,8 +38,7 @@ function initMap() {
     // Check to make sure the infowindow is not already opened on this marker.
     if (infowindow.marker != marker) {
       infowindow.marker = marker;
-      console.log(marker.position.lat());
-      infowindow.setContent('<div>' + marker.title + '</div>'+ '<a href=\"'+"https://www.google.com/maps/search/?api=1&query="+marker.position.lat()+", "+marker.position.lng()+""+'\">'+ "See here" +'</a>' );
+      infowindow.setContent('<div>' + marker.title + '</div>'+ '<a href=\"'+"https://www.google.com/maps/search/?api=1&query="+marker.position.lat()+", "+marker.position.lng()+""+'\">'+ "View on Google Maps" +'</a>' );
       infowindow.open(map, marker);
       // Make sure the marker property is cleared if the infowindow is closed.
       infowindow.addListener('closeclick',function(){
@@ -58,19 +55,19 @@ var ViewModle = function() {
   self.center = ko.observable({lat: 37.786971, lng: -122.399677});
   self.activeLocation = ko.observableArray([]);
   self.filter = function(){
-    //TODO: map markers need to be thined down
     var input = $("#textbox").val()
     for (var i = 0; i < self.activeLocation().length; i++) {
       if(self.activeLocation()[i].title.indexOf(input) !== -1){
           self.activeLocation.replace(self.activeLocation()[i],{title:self.activeLocation()[i].title, visable: true})
+          markers[i].setMap(map);
       }else{
           self.activeLocation.replace(self.activeLocation()[i],{title:self.activeLocation()[i].title, visable: false})
+          markers[i].setMap(null);
       }
     }
   }
   self.GetData = function() {
     $.getJSON("https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=10000&gscoord=37.786971%7C-122.399677&format=json&callback=?", function(data) {
-      console.log(data.query.geosearch);
       for (var i = 0; i < data.query.geosearch.length; i++) {
         var tempData = {title:data.query.geosearch[i].title,
         visable: true};
