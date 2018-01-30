@@ -6,6 +6,23 @@
 
 var markers = [];
 var map;
+
+function populateInfoWindow(marker, infowindow) {
+  // Check to make sure the infowindow is not already opened on this marker.
+  if (infowindow.marker != marker) {
+    infowindow.marker = marker;
+    infowindow.setContent('<div>' + marker.title + '</div>'+ '<a href=\"'+"https://www.google.com/maps/search/?api=1&query="+marker.position.lat()+", "+marker.position.lng()+""+'\">'+ "View on Google Maps" +'</a>' );
+    infowindow.open(map, marker);
+    // Make sure the marker property is cleared if the infowindow is closed.
+    infowindow.addListener('closeclick',function(){
+      infowindow.setMarker = null;
+    });
+
+  }
+
+}
+
+
 function initMap() {
   var largeInfowindow = new google.maps.InfoWindow();
   var bounds = new google.maps.LatLngBounds();
@@ -34,20 +51,6 @@ function initMap() {
     }
     map.fitBounds(bounds);
   });
-  function populateInfoWindow(marker, infowindow) {
-    // Check to make sure the infowindow is not already opened on this marker.
-    if (infowindow.marker != marker) {
-      infowindow.marker = marker;
-      infowindow.setContent('<div>' + marker.title + '</div>'+ '<a href=\"'+"https://www.google.com/maps/search/?api=1&query="+marker.position.lat()+", "+marker.position.lng()+""+'\">'+ "View on Google Maps" +'</a>' );
-      infowindow.open(map, marker);
-      // Make sure the marker property is cleared if the infowindow is closed.
-      infowindow.addListener('closeclick',function(){
-        infowindow.setMarker = null;
-      });
-
-    }
-
-}
 }
 
 var ViewModle = function() {
@@ -75,10 +78,22 @@ var ViewModle = function() {
       }
     });
   };
+  //close last window
+  var previousWindow;
   self.select = function(){
+    if(previousWindow != null){
+      previousWindow.close();
+    }
+    previousWindow = new google.maps.InfoWindow();
+    var bounds = new google.maps.LatLngBounds();
+    for (var i = 0; i < markers.length; i++) {
+      if(markers[i].title === this.title){
+        populateInfoWindow(markers[i], previousWindow);
+        break;
+      }
+
+    }
     //TODO: hover animation or color change
-    //TODO: display the map marker info
-    console.log(this);
   };
 };
 
