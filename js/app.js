@@ -1,105 +1,15 @@
 // TODO: make map fixed
 // TODO: implement wiki geo location
-// TODO: hover over list
+// TODO: hover over list text
 // TODO: make mobile freindly
 // TODO: errorhandle apis
 // TODO: comment code
 // TODO: filter list
-// TODO: markers
-/*  this.test = ko.computed(function() {
-    var list = [1,2,3,4]; //th5s needs to wait for the api call to finish
-    $.getJSON("https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=10000&gscoord=37.786971%7C-122.399677&format=json&callback=?", function(data) {
-      for (var i = 0; i < data.query.geosearch.length; i++) {
-        var marker = {
-          title: data.query.geosearch[i].title,
-          lat: data.query.geosearch[i].lat,
-          lng: data.query.geosearch[i].lon
-        };
-          list.push(marker);
-      }
-    });
-    return list;
+// TODO: make wiki search into varable so it is based on browser locaiton and also can change circle
+// TODO: filter jquery using mvc and figure out how to delet items out of an array tempararylt or add a atrablute visable and figuer it out through html
 
-
-    [new google.maps.Marker({
-      position: {
-        lat: data.query.geosearch[3].lat,
-        lng: data.query.geosearch[3].lon
-      },
-      map: map,
-      title: data.query.geosearch[3].title
-    }),new google.maps.Marker({
-      position: {
-        lat: data.query.geosearch[2].lat,
-        lng: data.query.geosearch[2].lon
-      },
-      map: map,
-      title: data.query.geosearch[2].title
-    })];
-  });
-
- console.log(this.test());*/
-
-ko.onDemandObservable = function(callback, target) {
-  var _value = ko.observable(); //private observable
-
-  var result = ko.dependentObservable({
-    read: function() {
-      //if it has not been loaded, execute the supplied function
-      if (!result.loaded()) {
-        callback.call(target);
-      }
-      //always return the current value
-      return _value();
-    },
-    write: function(newValue) {
-      //indicate that the value is now loaded and set it
-      result.loaded(true);
-      _value(newValue);
-    },
-    deferEvaluation: true //do not evaluate immediately when created
-  });
-
-  //expose the current state, which can be bound against
-  result.loaded = ko.observable();
-  //load it again
-  result.refresh = function() {
-    result.loaded(false);
-  };
-
-  return result;
-};
-
-
-
-
-var ViewModle = function() {
-  var self = this;
-  //size of the location
-  self.center = ko.observable({
-    lat: 37.786971,
-    lng: -122.399677
-  });
-
-  self.test = ko.observableArray([]);
-  self.GetData = function() {
-    $.getJSON("https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=10000&gscoord=37.786971%7C-122.399677&format=json&callback=?", function(data) {
-        for (var i = 0; i < data.query.geosearch.length; i++) {
-          self.test.push(data.query.geosearch[i].title)
-        }
-        console.log(data.query.geosearch)
-
-      });
-  };
-  console.log(self.GetData());
-  console.log(self.test())
-};
-ko.applyBindings(new ViewModle());
-
-
-
+var marker = [];
 var map;
-
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
     center: {
@@ -109,7 +19,6 @@ function initMap() {
     zoom: 13
   });
   $.getJSON("https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=10000&gscoord=37.786971%7C-122.399677&format=json&callback=?", function(data) {
-    var marker =[]
     for (var i = 0; i < data.query.geosearch.length; i++) {
       tempmarker = new google.maps.Marker({
         position: {
@@ -119,17 +28,37 @@ function initMap() {
         map: map,
         title: data.query.geosearch[i].title
       });
-      marker.push(tempmarker)
+      marker.push(tempmarker);
     }
-    console.log(marker)
-
-
   });
 
 }
 
-$(document).ready(function() {
+var ViewModle = function() {
+  var self = this;
+  self.center = ko.observable({lat: 37.786971, lng: -122.399677});
+  self.activeLocation = ko.observableArray([]);
+  self.filter = function(){
+    var input = $("#textbox").val()
+    for (var i = 0; i < self.activeLocation().length; i++) {
+      if(self.activeLocation()[i].title.indexOf(input) !== -1){
+          self.activeLocation.replace(self.activeLocation()[i],{title:self.activeLocation()[i].title, visable: true})
+      }else{
+          self.activeLocation.replace(self.activeLocation()[i],{title:self.activeLocation()[i].title, visable: false})
+      }
+    }
+  }
+  self.GetData = function() {
+    $.getJSON("https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=10000&gscoord=37.786971%7C-122.399677&format=json&callback=?", function(data) {
+      for (var i = 0; i < data.query.geosearch.length; i++) {
+        var tempData = {title:data.query.geosearch[i].title,
+        visable: true};
+        self.activeLocation.push(tempData)
+      }
+    });
+  };
+};
 
-
-
-});
+var vm = new ViewModle;
+vm.GetData()
+ko.applyBindings(vm);

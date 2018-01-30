@@ -22,11 +22,11 @@
   <h1>Neighborhood Map</h1><br>
   <div class="container">
     <div class="row">
-      <div class="col-4">
-        <input type="text" />
-        <input type="submit" value="filter" />
-        <ul data-bind="foreach: test">
-          <li data-bind="text: $data"> </li>
+      <div id="list" class="col-4">
+        <input id="textbox" type="text" />
+        <input data-bind="click: filter" type="submit" value="filter" />
+        <ul  data-bind="foreach: activeLocation">
+          <li data-bind="text: title, visible: $data.visable"> </li>
         </ul>
       </div>
       <div id="map" class="col-8 map-size"></div>
