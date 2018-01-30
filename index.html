@@ -26,7 +26,7 @@
         <input id="textbox" type="text" />
         <input data-bind="click: filter" type="submit" value="filter" />
         <ul  data-bind="foreach: activeLocation">
-          <li data-bind="text: title, visible: $data.visable"> </li>
+          <li data-bind="text: title,visible: $data.visable, click: $parent.select"> </li>
         </ul>
       </div>
       <div id="map" class="col-8 map-size"></div>

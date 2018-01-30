@@ -1,16 +1,16 @@
 // TODO: make map fixed
-// TODO: implement wiki geo location
-// TODO: hover over list text
 // TODO: make mobile freindly
 // TODO: errorhandle apis
 // TODO: comment code
-// TODO: filter list
 // TODO: make wiki search into varable so it is based on browser locaiton and also can change circle
-// TODO: filter jquery using mvc and figure out how to delet items out of an array tempararylt or add a atrablute visable and figuer it out through html
+// TODO: clicking on a marker makes it show info
 
-var marker = [];
+
+var markers = [];
 var map;
 function initMap() {
+  var largeInfowindow = new google.maps.InfoWindow();
+  var bounds = new google.maps.LatLngBounds();
   map = new google.maps.Map(document.getElementById('map'), {
     center: {
       lat: 37.786971,
@@ -28,10 +28,24 @@ function initMap() {
         map: map,
         title: data.query.geosearch[i].title
       });
-      marker.push(tempmarker);
+      markers.push(tempmarker);
+      tempmarker.addListener('click', function() {
+        populateInfoWindow(this, largeInfowindow);
+      });
     }
   });
-
+  function populateInfoWindow(marker, infowindow) {
+    // Check to make sure the infowindow is not already opened on this marker.
+    if (infowindow.marker != marker) {
+      infowindow.marker = marker;
+      infowindow.setContent('<div>' + marker.title + '</div>');
+      infowindow.open(map, marker);
+      // Make sure the marker property is cleared if the infowindow is closed.
+      infowindow.addListener('closeclick',function(){
+        infowindow.setMarker = null;
+      });
+    }
+}
 }
 
 var ViewModle = function() {
@@ -39,6 +53,7 @@ var ViewModle = function() {
   self.center = ko.observable({lat: 37.786971, lng: -122.399677});
   self.activeLocation = ko.observableArray([]);
   self.filter = function(){
+    //TODO: map markers need to be thined down
     var input = $("#textbox").val()
     for (var i = 0; i < self.activeLocation().length; i++) {
       if(self.activeLocation()[i].title.indexOf(input) !== -1){
@@ -56,6 +71,11 @@ var ViewModle = function() {
         self.activeLocation.push(tempData)
       }
     });
+  };
+  self.select = function(){
+    //TODO: hover animation or color change
+    //TODO: display the map marker info
+    console.log(this);
   };
 };
 
