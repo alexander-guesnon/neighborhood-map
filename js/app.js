@@ -32,19 +32,24 @@ function initMap() {
       tempmarker.addListener('click', function() {
         populateInfoWindow(this, largeInfowindow);
       });
+      bounds.extend(markers[i].position);
     }
+    map.fitBounds(bounds);
   });
   function populateInfoWindow(marker, infowindow) {
     // Check to make sure the infowindow is not already opened on this marker.
     if (infowindow.marker != marker) {
       infowindow.marker = marker;
-      infowindow.setContent('<div>' + marker.title + '</div>');
+      console.log(marker);
+      infowindow.setContent('<div>' + marker.title + '</div>' );
       infowindow.open(map, marker);
       // Make sure the marker property is cleared if the infowindow is closed.
       infowindow.addListener('closeclick',function(){
         infowindow.setMarker = null;
       });
+
     }
+
 }
 }
 
@@ -65,6 +70,7 @@ var ViewModle = function() {
   }
   self.GetData = function() {
     $.getJSON("https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=10000&gscoord=37.786971%7C-122.399677&format=json&callback=?", function(data) {
+      console.log(data.query.geosearch);
       for (var i = 0; i < data.query.geosearch.length; i++) {
         var tempData = {title:data.query.geosearch[i].title,
         visable: true};
