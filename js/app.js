@@ -40,8 +40,8 @@ function initMap() {
     // Check to make sure the infowindow is not already opened on this marker.
     if (infowindow.marker != marker) {
       infowindow.marker = marker;
-      console.log(marker);
-      infowindow.setContent('<div>' + marker.title + '</div>' );
+      console.log(marker.position.lat());
+      infowindow.setContent('<div>' + marker.title + '</div>'+ '<a href=\"'+"https://www.google.com/maps/search/?api=1&query="+marker.position.lat()+", "+marker.position.lng()+""+'\">'+ "See here" +'</a>' );
       infowindow.open(map, marker);
       // Make sure the marker property is cleared if the infowindow is closed.
       infowindow.addListener('closeclick',function(){
