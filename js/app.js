@@ -35,6 +35,7 @@ function initMap() {
   });
   //wikipida api json call
   $.getJSON("https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=10000&gscoord=37.786971%7C-122.399677&format=json&callback=?", function(data) {
+    var tempmarker;
     for (var i = 0; i < data.query.geosearch.length; i++) {
       tempmarker = new google.maps.Marker({
         position: {
@@ -45,11 +46,11 @@ function initMap() {
         title: data.query.geosearch[i].title
       });
       markers.push(tempmarker);
-      tempmarker.addListener('click', function() {
-        populateInfoWindow(this, previousWindow);
-      });
       bounds.extend(markers[i].position);
     }
+    tempmarker.addListener('click', function() {
+      populateInfoWindow(this, previousWindow);
+    });
     map.fitBounds(bounds);
   }).fail(function() {// if the json fails
     console.log("ERROR: wikipida API did not load the geo data for the map");
@@ -87,7 +88,7 @@ var ViewModle = function() {
         markers[i].setMap(null);
       }
     }
-  }
+  };
   //load data from wiki geo api into the activeLocations array
   self.GetData = function() {
     $.getJSON("https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=10000&gscoord=37.786971%7C-122.399677&format=json&callback=?", function(data) {
@@ -97,26 +98,26 @@ var ViewModle = function() {
           visable: true,
           hightlight: false
         };
-        self.activeLocation.push(tempData)
+        self.activeLocation.push(tempData);
       }
     }).fail(function() {
       console.log("ERROR: wikipida API did not load the geo data for the list");
     });
-  }
+  };
   // this is a hightlight style fro when a user clicks on the list
   self.style = function(item) {
-    if (item == true) return 'hightlightList';
-    if (item == false) return 'normal';
-  }
+    if (item === true) return 'hightlightList';
+    if (item === false) return 'normal';
+  };
   var previousitem;
   // if an item in teh list is clicked then make it red
   self.select = function() {
     //close last window
-    if (previousWindow != null) {
+    if (previousWindow !== null) {
       previousWindow.close();
     }
     // close the previuse list item so they dont all highlight
-    if (previousitem != null) {
+    if (previousitem !== null) {
       for (var i = 0; i < self.activeLocation().length; i++) {
         if (self.activeLocation()[i].title == previousitem.title) {
           self.activeLocation.replace(self.activeLocation()[i], {
@@ -138,9 +139,9 @@ var ViewModle = function() {
     // pop up the window on teh mapp
     previousWindow = new google.maps.InfoWindow();
     var bounds = new google.maps.LatLngBounds();
-    for (var i = 0; i < markers.length; i++) {
-      if (markers[i].title === this.title) {
-        populateInfoWindow(markers[i], previousWindow);
+    for (var j = 0; j < markers.length; j++) {
+      if (markers[j].title === this.title) {
+        populateInfoWindow(markers[j], previousWindow);
         break;
       }
 
@@ -149,6 +150,6 @@ var ViewModle = function() {
 };
 
 // apply bindings
-var vm = new ViewModle;
-vm.GetData()
+var vm = new ViewModle();
+vm.GetData();
 ko.applyBindings(vm);
