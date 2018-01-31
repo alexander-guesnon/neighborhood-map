@@ -4,3 +4,11 @@ body {
 .map-size{
   height: 500px;
 }
+.hightlightList{
+  color: #DC143C;
+  font-weight: bold;
+}
+.normal{
+  color: black;
+  font-weight: normal;
+}
