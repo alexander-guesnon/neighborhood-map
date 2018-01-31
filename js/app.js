@@ -1,4 +1,3 @@
-// TODO: comment code
 // TODO: README
 
 
@@ -27,12 +26,14 @@ function initMap() {
   previousWindow = new google.maps.InfoWindow();
   var bounds = new google.maps.LatLngBounds();
   map = new google.maps.Map(document.getElementById('map'), {
+    //san franciso
     center: {
       lat: 37.786971,
       lng: -122.399677
     },
     zoom: 13
   });
+  //wikipida api json call
   $.getJSON("https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=10000&gscoord=37.786971%7C-122.399677&format=json&callback=?", function(data) {
     for (var i = 0; i < data.query.geosearch.length; i++) {
       tempmarker = new google.maps.Marker({
@@ -50,21 +51,26 @@ function initMap() {
       bounds.extend(markers[i].position);
     }
     map.fitBounds(bounds);
-  }).fail(function() {
+  }).fail(function() {// if the json fails
     console.log("ERROR: wikipida API did not load the geo data for the map");
   });
 }
 
 var ViewModle = function() {
   var self = this;
-  self.center = ko.observable({
+  self.center = ko.observable({//san franciso
     lat: 37.786971,
     lng: -122.399677
   });
+  // wiki api location storage
   self.activeLocation = ko.observableArray([]);
+
+  //filter is what is used to filter the list trhought user input
+  //this function is activated on a click of a button
   self.filter = function() {
-    var input = $("#textbox").val();
+    var input = $("#textbox").val(); // get data from textbox
     for (var i = 0; i < self.activeLocation().length; i++) {
+      //if it is not equal to the sub string make set visable to false
       if (self.activeLocation()[i].title.indexOf(input) !== -1) {
         self.activeLocation.replace(self.activeLocation()[i], {
           title: self.activeLocation()[i].title,
@@ -82,6 +88,7 @@ var ViewModle = function() {
       }
     }
   }
+  //load data from wiki geo api into the activeLocations array
   self.GetData = function() {
     $.getJSON("https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=10000&gscoord=37.786971%7C-122.399677&format=json&callback=?", function(data) {
       for (var i = 0; i < data.query.geosearch.length; i++) {
@@ -96,18 +103,20 @@ var ViewModle = function() {
       console.log("ERROR: wikipida API did not load the geo data for the list");
     });
   }
+  // this is a hightlight style fro when a user clicks on the list
   self.style = function(item) {
     if (item == true) return 'hightlightList';
     if (item == false) return 'normal';
   }
   var previousitem;
+  // if an item in teh list is clicked then make it red
   self.select = function() {
     //close last window
     if (previousWindow != null) {
       previousWindow.close();
     }
+    // close the previuse list item so they dont all highlight
     if (previousitem != null) {
-
       for (var i = 0; i < self.activeLocation().length; i++) {
         if (self.activeLocation()[i].title == previousitem.title) {
           self.activeLocation.replace(self.activeLocation()[i], {
@@ -126,6 +135,7 @@ var ViewModle = function() {
       visable: this.visable,
       hightlight: true
     });
+    // pop up the window on teh mapp
     previousWindow = new google.maps.InfoWindow();
     var bounds = new google.maps.LatLngBounds();
     for (var i = 0; i < markers.length; i++) {
@@ -138,6 +148,7 @@ var ViewModle = function() {
   };
 };
 
+// apply bindings
 var vm = new ViewModle;
 vm.GetData()
 ko.applyBindings(vm);
