@@ -1,9 +1,8 @@
-// TODO: errorhandle apis
 // TODO: comment code
 // TODO: README
 
 
-var markers = [];
+var markers = []; // google maps marker list
 var map;
 var previousWindow;
 var previousitem;
@@ -51,6 +50,8 @@ function initMap() {
       bounds.extend(markers[i].position);
     }
     map.fitBounds(bounds);
+  }).fail(function() {
+    console.log("ERROR: wikipida API did not load the geo data for the map");
   });
 }
 
@@ -91,8 +92,10 @@ var ViewModle = function() {
         };
         self.activeLocation.push(tempData)
       }
+    }).fail(function() {
+      console.log("ERROR: wikipida API did not load the geo data for the list");
     });
-  };
+  }
   self.style = function(item) {
     if (item == true) return 'hightlightList';
     if (item == false) return 'normal';
