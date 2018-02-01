@@ -24,7 +24,7 @@
   <div class="container">
     <div class="row">
       <div id="list" class="col-lg-4">
-        <input id="textbox" type="text" />
+        <input data-bind="value: textBox" type="text" />
         <input data-bind="click: filter" type="submit" value="Filter" />
         <ul  data-bind="foreach: activeLocation">
           <li data-bind="text: title, visible: $data.visable, click: $parent.select, css : $parent.style($data.hightlight)"> </li>

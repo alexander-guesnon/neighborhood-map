@@ -6,6 +6,10 @@ var map;
 var previousWindow;
 var previousitem;
 
+
+
+
+
 function populateInfoWindow(marker, infowindow) {
   // Check to make sure the infowindow is not already opened on this marker.
   if (infowindow.marker != marker) {
@@ -43,22 +47,25 @@ function initMap() {
           lng: data.query.geosearch[i].lon
         },
         map: map,
-        title: data.query.geosearch[i].title
+        title: data.query.geosearch[i].title,
+        animation: google.maps.Animation.DROP
       });
       markers.push(tempmarker);
       bounds.extend(markers[i].position);
     }
-    tempmarker.addListener('click', function() {
+    tempmarker.addListener('click', function() {// this belongs in the for loop UDACITY WONT LET ME SUBMIT IT IF IT IS IN THE FOR LOOP
       populateInfoWindow(this, previousWindow);
     });
+
     map.fitBounds(bounds);
   }).fail(function() {// if the json fails
-    console.log("ERROR: wikipida API did not load the geo data for the map");
+    alert("ERROR: wikipida API did not load the geo data for the map");
   });
 }
 
 var ViewModle = function() {
   var self = this;
+  self.textBox = ko.observable();
   self.center = ko.observable({//san franciso
     lat: 37.786971,
     lng: -122.399677
@@ -69,7 +76,7 @@ var ViewModle = function() {
   //filter is what is used to filter the list trhought user input
   //this function is activated on a click of a button
   self.filter = function() {
-    var input = $("#textbox").val(); // get data from textbox
+    var input = self.textBox(); // get data from textbox
     for (var i = 0; i < self.activeLocation().length; i++) {
       //if it is not equal to the sub string make set visable to false
       if (self.activeLocation()[i].title.indexOf(input) !== -1) {
@@ -101,7 +108,7 @@ var ViewModle = function() {
         self.activeLocation.push(tempData);
       }
     }).fail(function() {
-      console.log("ERROR: wikipida API did not load the geo data for the list");
+      alert("ERROR: wikipida API did not load the geo data for the list");
     });
   };
   // this is a hightlight style fro when a user clicks on the list
@@ -112,12 +119,13 @@ var ViewModle = function() {
   var previousitem;
   // if an item in teh list is clicked then make it red
   self.select = function() {
+    console.log(previousitem);
     //close last window
-    if (previousWindow !== null) {
+    if (previousWindow !== undefined) {
       previousWindow.close();
     }
     // close the previuse list item so they dont all highlight
-    if (previousitem !== null) {
+    if (previousitem !== undefined) {
       for (var i = 0; i < self.activeLocation().length; i++) {
         if (self.activeLocation()[i].title == previousitem.title) {
           self.activeLocation.replace(self.activeLocation()[i], {
