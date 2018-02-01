@@ -5,12 +5,32 @@ var markers = []; // google maps marker list
 var map;
 var previousWindow;
 var previousitem;
+var bounds;
 
-
-
+function errorHander() {
+  alert("The google maps api is currently having an issue.");
+}
+function addMarker(a, info) {
+    var tempmarker;
+  tempmarker = new google.maps.Marker({
+    position: {
+      lat: info.query.geosearch[a].lat,
+      lng: info.query.geosearch[a].lon
+    },
+    map: map,
+    title: info.query.geosearch[a].title,
+    animation: google.maps.Animation.DROP
+  });
+  markers.push(tempmarker);
+  bounds.extend(markers[a].position);
+  tempmarker.addListener('click', function() {
+    populateInfoWindow(this, previousWindow);
+  });
+}
 
 
 function populateInfoWindow(marker, infowindow) {
+
   // Check to make sure the infowindow is not already opened on this marker.
   if (infowindow.marker != marker) {
     infowindow.marker = marker;
@@ -28,7 +48,9 @@ function populateInfoWindow(marker, infowindow) {
 
 function initMap() {
   previousWindow = new google.maps.InfoWindow();
-  var bounds = new google.maps.LatLngBounds();
+  bounds = new google.maps.LatLngBounds();
+
+
   map = new google.maps.Map(document.getElementById('map'), {
     //san franciso
     center: {
@@ -39,26 +61,14 @@ function initMap() {
   });
   //wikipida api json call
   $.getJSON("https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=10000&gscoord=37.786971%7C-122.399677&format=json&callback=?", function(data) {
-    var tempmarker;
-    for (var i = 0; i < data.query.geosearch.length; i++) {
-      tempmarker = new google.maps.Marker({
-        position: {
-          lat: data.query.geosearch[i].lat,
-          lng: data.query.geosearch[i].lon
-        },
-        map: map,
-        title: data.query.geosearch[i].title,
-        animation: google.maps.Animation.DROP
-      });
-      markers.push(tempmarker);
-      bounds.extend(markers[i].position);
+
+      for (var i = 0; i < data.query.geosearch.length; i++) {
+        addMarker(i, data);
     }
-    tempmarker.addListener('click', function() {// this belongs in the for loop UDACITY WONT LET ME SUBMIT IT IF IT IS IN THE FOR LOOP
-      populateInfoWindow(this, previousWindow);
-    });
+
 
     map.fitBounds(bounds);
-  }).fail(function() {// if the json fails
+  }).fail(function() { // if the json fails
     alert("ERROR: wikipida API did not load the geo data for the map");
   });
 }
@@ -66,7 +76,7 @@ function initMap() {
 var ViewModle = function() {
   var self = this;
   self.textBox = ko.observable();
-  self.center = ko.observable({//san franciso
+  self.center = ko.observable({ //san franciso
     lat: 37.786971,
     lng: -122.399677
   });
@@ -116,16 +126,16 @@ var ViewModle = function() {
     if (item === true) return 'hightlightList';
     if (item === false) return 'normal';
   };
-  var previousitem;
+  var previousitem = null;
   // if an item in teh list is clicked then make it red
   self.select = function() {
     console.log(previousitem);
     //close last window
-    if (previousWindow !== undefined) {
+    if (previousWindow !== null) {
       previousWindow.close();
     }
     // close the previuse list item so they dont all highlight
-    if (previousitem !== undefined) {
+    if (previousitem !== null) {
       for (var i = 0; i < self.activeLocation().length; i++) {
         if (self.activeLocation()[i].title == previousitem.title) {
           self.activeLocation.replace(self.activeLocation()[i], {
