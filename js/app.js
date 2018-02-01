@@ -5,49 +5,69 @@ var markers = []; // google maps marker list
 var map;
 var previousWindow;
 var previousitem;
+var previousMarker = null;
 var bounds;
+var wikiJson = null;
 
 function errorHander() {
   alert("The google maps api is currently having an issue.");
 }
-function addMarker(forLoopPosition, info) {
-    var tempmarker;
+
+function markerBounce(tempmarker) {
+  tempmarker.setAnimation(google.maps.Animation.BOUNCE);
+  window.setTimeout(function() {
+    tempmarker.setAnimation(null);
+  }, 750);
+}
+
+function addMarker(forLoopPosition) {
+  var tempmarker;
   tempmarker = new google.maps.Marker({
     position: {
-      lat: info.query.pages[forLoopPosition].coordinates[0].lat,
-      lng: info.query.pages[forLoopPosition].coordinates[0].lon
+      lat: wikiJson.query.pages[forLoopPosition].coordinates[0].lat,
+      lng: wikiJson.query.pages[forLoopPosition].coordinates[0].lon
     },
+    icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
     map: map,
-    title: info.query.pages[forLoopPosition].title,
+    title: wikiJson.query.pages[forLoopPosition].title,
     animation: google.maps.Animation.DROP
   });
   markers.push(tempmarker);
   bounds.extend(markers[forLoopPosition].position);
   tempmarker.addListener('click', function() {
-    populateInfoWindow(this, previousWindow, info);
+    if (previousWindow !== null) {
+      previousWindow.close();
+    }
+    populateInfoWindow(this, previousWindow);
+    if (previousMarker !== null) {
+      previousMarker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png');
+    }
+    tempmarker.setIcon('http://maps.google.com/mapfiles/ms/icons/blue-dot.png');
+    previousMarker = tempmarker;
+    markerBounce(tempmarker);
+
   });
 }
 
 
-function populateInfoWindow(marker, infowindow, info) {
+function populateInfoWindow(marker, infowindow) {
   // Check to make sure the infowindow is not already opened on this marker.
-  console.log(info)
   if (infowindow.marker != marker) {
     var infoWindowContent = "";
     var wikiPostion = 0;
-    for (var i = 0; i < info.query.pages.length; i++) {
-        if (marker.title == info.query.pages[i].title) {
-          wikiPostion = i;
-          break;
-        }
+    console.log(wikiJson);
+    for (var i = 0; i < wikiJson.query.pages.length; i++) {
+      if (marker.title == wikiJson.query.pages[i].title) {
+        wikiPostion = i;
+        break;
+      }
     }
     infowindow.marker = marker;
-    infoWindowContent += ("<h5>" + marker.title + "</h4>" ); // title from wikipida
-    infoWindowContent += ("<img src=\"" + info.query.pages[wikiPostion].thumbnail.source + "\">" ); // description from wikipida
-    infoWindowContent += ("<div>" + info.query.pages[wikiPostion].terms.description[0] + "</div>" ); // thumbnail from wikipida
+    infoWindowContent += ("<h5>" + marker.title + "</h4>"); // title from wikipida
+    infoWindowContent += ("<img src=\"" + wikiJson.query.pages[wikiPostion].thumbnail.source + "\">"); // description from wikipida
+    infoWindowContent += ("<div>" + wikiJson.query.pages[wikiPostion].terms.description[0] + "</div>"); // thumbnail from wikipida
     infoWindowContent += ("<a href=\"" + "https://www.google.com/maps/search/?api=1&query=" + marker.position.lat() + ", " + marker.position.lng() + "" + '\">' + "View on Google Maps" + '</a></br>'); // location on google
-    infoWindowContent += ("<a href=\"" + "https://en.wikipedia.org/?curid=" + info.query.pages[wikiPostion].pageid + '\">' + "Look at Their Wiki Page" + '</a>'); // artical from wikipida
-    console.log(infoWindowContent);
+    infoWindowContent += ("<a href=\"" + "https://en.wikipedia.org/?curid=" + wikiJson.query.pages[wikiPostion].pageid + '\">' + "Look at Their Wiki Page" + '</a>'); // artical from wikipida
     infowindow.setContent(infoWindowContent);
     infowindow.open(map, marker);
     // Make sure the marker property is cleared if the infowindow is closed.
@@ -75,9 +95,9 @@ function initMap() {
   });
   //wikipida api json call
   $.getJSON("https://en.wikipedia.org/w/api.php?action=query&prop=coordinates%7Cpageimages%7Cpageterms&colimit=50&piprop=thumbnail&pithumbsize=144&pilimit=50&wbptterms=description&generator=geosearch&ggscoord=37.786971%7C-122.399677&ggsradius=10000&ggslimit=10&formatversion=2&format=json&callback=?", function(data) {
-
-      for (var i = 0; i < data.query.pages.length; i++) {
-        addMarker(i, data);
+    wikiJson = data;
+    for (var i = 0; i < wikiJson.query.pages.length; i++) {
+      addMarker(i);
     }
 
 
@@ -143,7 +163,6 @@ var ViewModle = function() {
   var previousitem = null;
   // if an item in teh list is clicked then make it red
   self.select = function() {
-    console.log(previousitem);
     //close last window
     if (previousWindow !== null) {
       previousWindow.close();
@@ -168,16 +187,23 @@ var ViewModle = function() {
       visable: this.visable,
       hightlight: true
     });
-    // pop up the window on teh mapp
+    // pop up the window on the map
     previousWindow = new google.maps.InfoWindow();
     var bounds = new google.maps.LatLngBounds();
     for (var j = 0; j < markers.length; j++) {
       if (markers[j].title === this.title) {
-        populateInfoWindow(markers[j], previousWindow);
+        populateInfoWindow(markers[j], previousWindow, wikiJson);
+        if (previousMarker !== null) {
+          previousMarker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png');
+        }
+        markers[j].setIcon('http://maps.google.com/mapfiles/ms/icons/blue-dot.png');
+        markerBounce(markers[j])
+        previousMarker = markers[j];
         break;
       }
 
     }
+
   };
 };
 
