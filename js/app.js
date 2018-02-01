@@ -1,4 +1,9 @@
-// TODO: README
+// befor submiting to github
+//TODO: thin down number of apis calls (put in dac ready or somthing to make it only one
+//TODO: make it visualy apiealing.
+// TODO: clicking on marker will highlight on the list
+//TODO: live update the list when searching (look in udacity review)
+
 
 
 var markers = []; // google maps marker list
@@ -55,7 +60,6 @@ function populateInfoWindow(marker, infowindow) {
   if (infowindow.marker != marker) {
     var infoWindowContent = "";
     var wikiPostion = 0;
-    console.log(wikiJson);
     for (var i = 0; i < wikiJson.query.pages.length; i++) {
       if (marker.title == wikiJson.query.pages[i].title) {
         wikiPostion = i;
@@ -142,10 +146,11 @@ var ViewModle = function() {
   };
   //load data from wiki geo api into the activeLocations array
   self.GetData = function() {
-    $.getJSON("https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=10000&gscoord=37.786971%7C-122.399677&format=json&callback=?", function(data) {
-      for (var i = 0; i < data.query.geosearch.length; i++) {
+    $.getJSON("https://en.wikipedia.org/w/api.php?action=query&prop=coordinates%7Cpageimages%7Cpageterms&colimit=50&piprop=thumbnail&pithumbsize=144&pilimit=50&wbptterms=description&generator=geosearch&ggscoord=37.786971%7C-122.399677&ggsradius=10000&ggslimit=10&formatversion=2&format=json&callback=?", function(data) {
+      wikiJson = data;
+      for (var i = 0; i < wikiJson.query.pages.length; i++) {
         var tempData = {
-          title: data.query.geosearch[i].title,
+          title: wikiJson.query.pages[i].title,
           visable: true,
           hightlight: false
         };
@@ -197,7 +202,7 @@ var ViewModle = function() {
           previousMarker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png');
         }
         markers[j].setIcon('http://maps.google.com/mapfiles/ms/icons/blue-dot.png');
-        markerBounce(markers[j])
+        markerBounce(markers[j]);
         previousMarker = markers[j];
         break;
       }
