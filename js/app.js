@@ -10,31 +10,45 @@ var bounds;
 function errorHander() {
   alert("The google maps api is currently having an issue.");
 }
-function addMarker(a, info) {
+function addMarker(forLoopPosition, info) {
     var tempmarker;
   tempmarker = new google.maps.Marker({
     position: {
-      lat: info.query.geosearch[a].lat,
-      lng: info.query.geosearch[a].lon
+      lat: info.query.pages[forLoopPosition].coordinates[0].lat,
+      lng: info.query.pages[forLoopPosition].coordinates[0].lon
     },
     map: map,
-    title: info.query.geosearch[a].title,
+    title: info.query.pages[forLoopPosition].title,
     animation: google.maps.Animation.DROP
   });
   markers.push(tempmarker);
-  bounds.extend(markers[a].position);
+  bounds.extend(markers[forLoopPosition].position);
   tempmarker.addListener('click', function() {
-    populateInfoWindow(this, previousWindow);
+    populateInfoWindow(this, previousWindow, info);
   });
 }
 
 
-function populateInfoWindow(marker, infowindow) {
-
+function populateInfoWindow(marker, infowindow, info) {
   // Check to make sure the infowindow is not already opened on this marker.
+  console.log(info)
   if (infowindow.marker != marker) {
+    var infoWindowContent = "";
+    var wikiPostion = 0;
+    for (var i = 0; i < info.query.pages.length; i++) {
+        if (marker.title == info.query.pages[i].title) {
+          wikiPostion = i;
+          break;
+        }
+    }
     infowindow.marker = marker;
-    infowindow.setContent('<div>' + marker.title + '</div>' + '<a href=\"' + "https://www.google.com/maps/search/?api=1&query=" + marker.position.lat() + ", " + marker.position.lng() + "" + '\">' + "View on Google Maps" + '</a>');
+    infoWindowContent += ("<h5>" + marker.title + "</h4>" ); // title from wikipida
+    infoWindowContent += ("<img src=\"" + info.query.pages[wikiPostion].thumbnail.source + "\">" ); // description from wikipida
+    infoWindowContent += ("<div>" + info.query.pages[wikiPostion].terms.description[0] + "</div>" ); // thumbnail from wikipida
+    infoWindowContent += ("<a href=\"" + "https://www.google.com/maps/search/?api=1&query=" + marker.position.lat() + ", " + marker.position.lng() + "" + '\">' + "View on Google Maps" + '</a></br>'); // location on google
+    infoWindowContent += ("<a href=\"" + "https://en.wikipedia.org/?curid=" + info.query.pages[wikiPostion].pageid + '\">' + "Look at Their Wiki Page" + '</a>'); // artical from wikipida
+    console.log(infoWindowContent);
+    infowindow.setContent(infoWindowContent);
     infowindow.open(map, marker);
     // Make sure the marker property is cleared if the infowindow is closed.
     infowindow.addListener('closeclick', function() {
@@ -60,9 +74,9 @@ function initMap() {
     zoom: 13
   });
   //wikipida api json call
-  $.getJSON("https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=10000&gscoord=37.786971%7C-122.399677&format=json&callback=?", function(data) {
+  $.getJSON("https://en.wikipedia.org/w/api.php?action=query&prop=coordinates%7Cpageimages%7Cpageterms&colimit=50&piprop=thumbnail&pithumbsize=144&pilimit=50&wbptterms=description&generator=geosearch&ggscoord=37.786971%7C-122.399677&ggsradius=10000&ggslimit=10&formatversion=2&format=json&callback=?", function(data) {
 
-      for (var i = 0; i < data.query.geosearch.length; i++) {
+      for (var i = 0; i < data.query.pages.length; i++) {
         addMarker(i, data);
     }
 
