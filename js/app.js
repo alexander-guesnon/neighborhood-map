@@ -1,11 +1,3 @@
-// befor submiting to github
-//TODO: thin down number of apis calls (put in dac ready or somthing to make it only one
-//TODO: make it visualy apiealing.
-// TODO: clicking on marker will highlight on the list
-//TODO: live update the list when searching (look in udacity review)
-
-
-
 var markers = []; // google maps marker list
 var map;
 var previousWindow;
