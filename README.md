@@ -1,6 +1,6 @@
 # Udacity Neighborhood Map
 
-uses google maps and the geo location from wikipedia
+This appication is a map that tells intresting locations, given an area, that I completed for the Udacity front end mondual.
 
 ## Outline
 
