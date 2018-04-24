@@ -4,12 +4,11 @@ This appication is a map that tells intresting locations, given an area.
 
 ## Outline
 
-- This is what the application should do:
 
-  - Filter Locations
-  - List View
-  - Map and Markers
-  - One third party API besides Google maps.
+ - Filter Locations
+ - List View
+ - Map and Markers
+ - One third party API besides Google maps.
 
 ## API
 
