@@ -1,6 +1,6 @@
-# Udacity Neighborhood Map
+# Neighborhood Map
 
-This appication is a map that tells intresting locations, given an area, that I completed for the Udacity front end mondual.
+This appication is a map that tells intresting locations, given an area.
 
 ## Outline
 
@@ -25,4 +25,4 @@ Open `index.html` in a Web Browser.
 
 ## License
 
-Udacity Neighborhood Map is distributed under the GPLv3 license.
+Neighborhood Map is distributed under the GPLv3 license.
