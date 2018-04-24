@@ -4,7 +4,7 @@ This appication is a map that tells intresting locations, given an area.
 
 ## Outline
 
-- The application needs to be able to do the following :
+- This is what the application should do:
 
   - Filter Locations
   - List View
